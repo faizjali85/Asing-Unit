@@ -1,0 +1,522 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Asing Baju Ikut Unit</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: satu lajur gaya senarai semak stor — input di atas, hasil dikumpul ikut unit dengan tag rak di kiri. */
+:root{
+  --bg:#f1f4f3; --surface:#ffffff; --ink:#18211f; --muted:#5a6966; --line:#d3dbd8;
+  --accent:#8b2659; --accent-soft:#f6e6ee; --on-accent:#ffffff;
+  --warn:#8a5a00; --warn-soft:#fbefd2; --bad:#a3271f; --bad-soft:#fbe4e1; --ok:#1f6b4d;
+  --display:"Bricolage Grotesque","Trebuchet MS",sans-serif;
+  --body:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#121817; --surface:#1b2322; --ink:#e9efed; --muted:#9aaaa6; --line:#33403d;
+  --accent:#e58bb9; --accent-soft:#3a2130; --on-accent:#2a0d1c;
+  --warn:#f0c463; --warn-soft:#3a2f14; --bad:#f29a92; --bad-soft:#3d1f1c; --ok:#7fd1ae; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#121817; --surface:#1b2322; --ink:#e9efed; --muted:#9aaaa6; --line:#33403d;
+  --accent:#e58bb9; --accent-soft:#3a2130; --on-accent:#2a0d1c;
+  --warn:#f0c463; --warn-soft:#3a2f14; --bad:#f29a92; --bad-soft:#3d1f1c; --ok:#7fd1ae; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:flex;flex-direction:column;gap:20px}
+h1{font-family:var(--display);font-weight:800;font-size:1.9rem;line-height:1.05;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:600;font-size:1.15rem;margin:0}
+.lede{color:var(--muted);margin:6px 0 0;max-width:56ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px}
+label.lbl{font-weight:600;font-size:.9rem}
+textarea{width:100%;min-height:170px;resize:vertical;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button,.filebtn{font:inherit;font-weight:600;border-radius:8px;padding:11px 16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;min-height:44px;display:inline-flex;align-items:center}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+button:focus-visible,.filebtn:focus-within,textarea:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.filepick{display:flex;flex-direction:column;gap:6px;border:1px dashed var(--line);border-radius:8px;padding:10px 12px}
+.filepick input{font:inherit;font-size:16px;color:var(--ink);max-width:100%}
+.hint{color:var(--muted);font-size:.85rem;margin:0}
+.tagnote{display:inline-block;background:var(--warn-soft);color:var(--warn);font-size:.78rem;font-weight:600;padding:2px 8px;border-radius:99px}
+.stats{display:flex;flex-wrap:wrap;gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:.85rem;color:var(--muted)}
+.stat b{font-family:var(--mono);font-size:1.05rem;color:var(--ink);margin-right:6px;font-variant-numeric:tabular-nums}
+.stat.bad b{color:var(--bad)}
+.unit{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.unit-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;background:var(--accent-soft);border-bottom:1px solid var(--line)}
+.unit-name{font-family:var(--mono);font-weight:600;letter-spacing:.04em;color:var(--accent)}
+.unit-count{font-family:var(--mono);font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.unit.miss .unit-head{background:var(--bad-soft)}
+.unit.miss .unit-name{color:var(--bad)}
+ul.items{list-style:none;margin:0;padding:0}
+ul.items li{border-top:1px solid var(--line)}
+ul.items li:first-child{border-top:0}
+.item{display:flex;gap:12px;align-items:flex-start;padding:10px 14px;cursor:pointer}
+.item input{width:22px;height:22px;margin:2px 0 0;accent-color:var(--accent);flex:none}
+.item-main{min-width:0;flex:1}
+.item-name{font-weight:600;overflow-wrap:anywhere}
+.item-src{color:var(--muted);font-size:.85rem;overflow-wrap:anywhere}
+.item input:checked ~ .item-main,.item input:checked ~ .qty{opacity:.45;text-decoration:line-through}
+.size{display:inline-block;font-family:var(--mono);font-size:.78rem;font-weight:600;background:var(--accent-soft);color:var(--accent);padding:1px 7px;border-radius:5px;margin-right:8px;vertical-align:middle}
+.qty{font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums;flex:none}
+.badge{display:inline-block;font-size:.72rem;font-weight:600;padding:1px 7px;border-radius:99px;margin-left:6px;vertical-align:middle;text-decoration:none}
+.badge.maybe{background:var(--warn-soft);color:var(--warn)}
+.badge.also{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.msg{font-size:.9rem;margin:0;color:var(--ok);font-weight:500}
+.msg.err{color:var(--bad)}
+details{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+summary{cursor:pointer;font-weight:600}
+.master{display:flex;flex-direction:column;gap:10px;margin-top:12px;font-size:.85rem}
+.master b{font-family:var(--mono);color:var(--accent)}
+.master p{margin:0;color:var(--muted);overflow-wrap:anywhere}
+#copyOut{min-height:120px;font-family:var(--mono);font-size:13px}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Asing Baju Ikut Unit</h1>
+    <p class="lede">Tampal atau upload senarai baju. Setiap baju dipadankan dengan unit simpanannya supaya senang dicari.</p>
+  </header>
+
+  <section class="panel">
+    <div class="row" style="justify-content:space-between">
+      <label class="lbl" for="src">Senarai baju (satu baju satu baris)</label>
+      <span class="tagnote" id="sampleTag">Contoh sahaja</span>
+    </div>
+    <textarea id="src" spellcheck="false"></textarea>
+    <div class="row">
+      <button class="primary" id="go" type="button">Asingkan ikut unit</button>
+            <button id="clear" type="button">Kosongkan</button>
+    </div>
+    <div class="filepick"><label class="lbl" for="file">Atau upload fail PDF / Excel / CSV / TXT</label><input id="file" type="file"></div>
+    <p class="hint">Kalau pemilih fail tidak terbuka, salin sel dari Excel dan tampal terus ke kotak di atas.</p>
+    <p class="hint">Boleh tulis sekali saiz dan kuantiti, contohnya <em>Alice Dusty Pink M x2</em>. Baju, warna dan saiz yang sama digabung jadi satu baris dengan jumlah kuantiti. Tanpa kuantiti, dikira 1 helai. Huruf besar atau kecil tidak penting.</p>
+    <p class="msg" id="fileMsg" hidden></p>
+  </section>
+
+  <section id="out" style="display:flex;flex-direction:column;gap:14px">
+    <div class="row" style="justify-content:space-between">
+      <h2>Hasil</h2>
+      <div class="stats" id="stats"></div>
+    </div>
+    <div class="row">
+      <button class="primary" id="dl" type="button">Muat turun Excel</button>
+      <button class="primary" id="pdf" type="button">Muat turun PDF</button>
+      <button id="copyXls" type="button">Salin untuk Excel</button>
+      <button id="copy" type="button">Salin untuk WhatsApp</button>
+    </div>
+    <p class="msg" id="actMsg" hidden></p>
+    <textarea id="copyOut" hidden readonly></textarea>
+    <div id="groups" style="display:flex;flex-direction:column;gap:14px"></div>
+  </section>
+
+  <details>
+    <summary>Lihat senarai induk baju mengikut unit</summary>
+    <div class="master" id="master"></div>
+  </details>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const MASTER = {
+"GROUND FLOOR":"SET 4 SIRI BAHASA MELAYU,SET 8 SIRI MATEMATIK AWAL,SET MATEMATIK TAHUN 4 MPT4,MATEMATIK TAHUN 1,ENGLISH TAHUN 1",
+"UNIT 2/OTHERS":"LARASATI,ADELYN,HUMAIRA,NIAN,ALYA,INTAN,DAYANA,AIREEN,NEEYA,HANNA,HAURA,NAIMA,LEANDRA,SEPHIA,AIRISH,LAURA",
+"UNIT 3":"LAIBA,ALLURE,ARAA,BERKELEY,CLAIRE,DELREY,DIXIE,INDAH,JULIET,KENDAL,LEESA,LYDIA,NESSE,PUTEH,RAISSA,AFEEYA,RAPUNZEL,SALOMA,SELENA,SULTANA,JUWITA,BIDADARI,DELIMA SARI,KHADEEJA,MURNI,PUSPAWATI,AUNII,NADIYA,NEESYA,AINAA,JANNAH,HARISSA,PUTERI,WIDURI,QAIRINA,AIRAA,IMAN,SRI WULAN,ELYANA,AUREA,KHALEEDA,ELARA,KARTIKA,REENA,AMBER,KHAWLA,AYLA,NAURAH,DARIYA,ASTILLA,IMAAN,RANIA",
+"UNIT 4":"ADIRA,AMANDA,ANGGERIK,ANNIKA,BERLY,CAMPBELL,CARISSA,CASILDA,CENDANA,DOLLY,FLORENCE,HANIA,HELEN,KAYLEE,KHAYLA,KIERA,KIMBERLY,MALIKA,MELIAN,MONTE,NAOMI,TURLINGTON,NUR NILAM,AMEENA,ZAHRA,ROSSA,ATHALIA,NULISA,AULIA,RAISYA,IMANI,ELISYA,CATANIA,MELISSA,NEEVA,DAYANG,NEVA",
+"UNIT 5":"ALICE,ANNA,ANNETTE,ARIELLA,CAMELIA,CLARA,DELISHA,DIAN,ENANG,GEORGIA,HADID,HALLE,HAZEL,ISABELLE,KAUSAR,KENDRA,MELANIE,MELUR,PATITZ,QAISARA,RIHANNA,SELASIH,SRI ANGGUN,SALSABILA,BALQIS,DELAILA,SELASEH,NIRMALA,LESTARI,AISYA,DIANA V1,TANIA,CALLISTA,JAZMINE",
+"UNIT 6":"ADEEBAH,ADINDA,ALEEYA,ARISSA,BLAKE,CHLOE,DHIA,ISLA,JANE,LENORA,LILY,MIRANDA,OPHELIA,ORKED,SAFIYAH,TUN TEJA,BAYU,CHEMPAKA,SALEHA,AZIZAH,JESNITA,ARIANA,HANNAH,NADELIA,QISTINA,AMNII,NAORA,NADEERA,ZOEY,DAISY,FLAIR,DAIYAN,MARYAM,SHAKILAA,LEEYA,QISYA",
+"UNIT 7":"ALICIA,AMANI,AMARA,BUNGA,CARMEN,CARMILLA,DAMARIS,FATEMA,HARLEY,JEWEL,MAHARANI,MARGARET,NUHA,RAYLEE,WAN LAILA,MAYANG,KEDASIH,ZAINAB,RAUDAH,ARDELLE,BIDASARI,KIRANA,TIARA,LUNA,RAIHANA,JENTAYU,SIERRA",
+"UNIT 8":"ALEENA,AMNA,BILLIE,BRIANNA,CARLY,DANEEN,DELILAH,GUERRA,DELCY,PARISA,QUINN,SARAH,SEROJA,SOFEA,DIANA V2,DANG ANUM,ALYSSA,SUZANNE,ERENA",
+"GUNI":"ADWA,AMBERLYN,AUBREY,BELLE,BELUCCI,CLOVER,FLEUR,HAWA,HONEYJUNE,MAPLE,NAIRA,NATALIE,STELA,CARABELLA,EDREA,MAGNOLIA,MARDIAH,NUR,TIFFANY,BEATRICE"
+};
+const GROUND = "GROUND FLOOR";
+const ALIAS = {"SET 4 SIRI BAHASA MELAYU":["SET 4 BAHASA MELAYU"],"HUMAIRA":["HUMAIRAH"],"LAIBA/AFEEYA":["LAIBA","AFEEYA"],"DIANA V1":["DIANA"],"DIANA V2":["DIANA"],"SET 8 SIRI MATEMATIK AWAL":["SIRI MATEMATIK AWAL","MATEMATIK AWAL"],"SET MATEMATIK TAHUN 4 MPT4":["SET MATEMATIK MPT4","MATEMATIK MPT4","MATEMATIK TAHUN 4 MPT4","MPT4"]};
+const UNITS = Object.keys(MASTER);
+const STOP = new Set(["BAJU","KURUNG","SAIZ","SIZE","WARNA","HELAI","UNIT","KOD","ORDER","PASANG","KUANTITI","JUMLAH","QUANTITY","FREE","FREESIZE"]);
+const SAMPLE = "ALICE Dusty Pink - M\nAlice dusty pink M x2\nalice Sage Green L\nSri Wulan L 3 helai\nkimberly xs\nKimberly XS 2\nCamelia - S\nRaihana 2XL\nZOEY M\nMelatii - L\nOrkid M\nKenanga S\nBuku Latihan Matematik Tahun 4 x2\nBuku Latihan Matematik Tahun 4";
+
+const norm = s => String(s).toUpperCase().replace(/[^A-Z0-9]+/g," ").trim();
+const INDEX = new Map(); // kunci → [{unit,name}]
+for (const u of UNITS) for (const name of MASTER[u].split(",")) {
+  for (const k of new Set([norm(name), ...(ALIAS[name]||[]).map(norm)])) {
+    if (!INDEX.has(k)) INDEX.set(k, []);
+    if (!INDEX.get(k).some(e => e.unit===u && e.name===name)) INDEX.get(k).push({unit:u, name});
+  }
+}
+const KEYS = [...INDEX.keys()].sort((a,b)=>b.length-a.length);
+const SINGLE = KEYS.filter(k=>!k.includes(" "));
+
+function lev(a,b,max){
+  if (Math.abs(a.length-b.length)>max) return max+1;
+  let prev = Array.from({length:b.length+1},(_,i)=>i);
+  for (let i=1;i<=a.length;i++){
+    const cur=[i];
+    for (let j=1;j<=b.length;j++) cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    prev=cur;
+  }
+  return prev[b.length];
+}
+
+const SIZE_RE = /^(X{0,3}[SL]|M|[2-9]X[SL]|FREE|FS|FREESIZE)$/;
+const QTY_UNIT = new Set(["PCS","PC","HELAI","PASANG","SET","KEPING"]);
+const QTY_WORD = new Set(["QTY","KUANTITI","JUMLAH","QUANTITY","BIL"]);
+const COLOR_SKIP = new Set(["WARNA","COLOR","COLOUR","BAJU","KURUNG","KOD","ORDER","SAIZ","SIZE","QTY","KUANTITI","JUMLAH","QUANTITY","BIL","PCS","PC","HELAI","PASANG","KEPING","X","ADEL","ALC","KIDS"]);
+function parseExtra(s, preSize){
+  const t = s.trim().split(/\s+/).filter(x=>x && x!=="#"), used = t.map(()=>false), num = x=>/^\d{1,3}$/.test(x||"");
+  let size = preSize || "", qty = null, m;
+  for (let i=0;i<t.length;i++) {
+    if ((t[i]==="SAIZ"||t[i]==="SIZE") && t[i+1]) { used[i]=used[i+1]=true; if(!size) size=t[i+1]; }
+    else if (t[i]==="UNIT" && num(t[i+1])) { used[i]=used[i+1]=true; }
+  }
+  for (let i=0;i<t.length;i++) if (!used[i] && !size && SIZE_RE.test(t[i])) { size=t[i]; used[i]=true; }
+  for (let i=0;i<t.length && qty===null;i++) { if (used[i]) continue;
+    if ((m=/^X(\d{1,3})$/.exec(t[i])) || (m=/^(\d{1,3})(?:X|PCS|PC|HELAI|PASANG|SET)$/.exec(t[i]))) { qty=+m[1]; used[i]=true; }
+    else if ((t[i]==="X" || QTY_WORD.has(t[i])) && num(t[i+1]) && !used[i+1]) { qty=+t[i+1]; used[i]=used[i+1]=true; }
+    else if (num(t[i]) && (QTY_UNIT.has(t[i+1]) || t[i+1]==="X")) { qty=+t[i]; used[i]=used[i+1]=true; }
+  }
+  if (qty===null) for (let i=t.length-1;i>=0;i--) if (!used[i] && num(t[i]) && +t[i]>0) { qty=+t[i]; used[i]=true; break; }
+  const color = [...new Set(t.filter((x,i)=>!used[i] && !/^\d+$/.test(x) && !COLOR_SKIP.has(x) && x!==size))].join(" ");
+  return {size, color, qty: qty && qty>0 ? qty : 1};
+}
+function merge(items){
+  const map = new Map();
+  for (const it of items) {
+    const k = it.name+"|"+it.size+"|"+it.color, cur = map.get(k);
+    if (cur) { cur.qty += it.qty; cur.maybe = cur.maybe || it.maybe; }
+    else map.set(k, {...it});
+  }
+  return [...map.values()].sort((a,b)=>a.name.localeCompare(b.name) || a.color.localeCompare(b.color) || a.size.localeCompare(b.size));
+}
+const total = items => items.reduce((n,it)=>n+it.qty,0);
+
+const NOT_BAJU = / (BUKU|SIRI|LATIHAN|MATEMATIK|BAHASA|TAHUN|JILID|AKTIVITI|KSPK|PRASEKOLAH|TADIKA|SAINS|JAWI|WORKBOOK|MODUL|ALC) /;
+const BRAND = new Set(["ADEL","ALC"]);
+const LEAD_SKIP = new Set(["BAJU","KURUNG","MODEN","KOD","ORDER"]);
+const SKIP_RE = /^(PICK ?LIST|PICKING LIST|PRINTED ON|TOTAL (ORDERS?|QUANTITY|QTY|ITEMS?|SKUS?)\b|PAGE \d+( OF \d+)?$|(NO )?NAME( VARIANT)?( QTY| QUANTITY)?$)/;
+const HEADER_RE = /^(NO |BIL )?(NAMA )?(PRODUK|ITEM|BARANG)( QTY| KUANTITI| JUMLAH)?$/;
+// Pecahkan satu baris: lajur kuantiti, nombor siri, dan bahagian "NAMA WARNA - SAIZ - JENAMA".
+function prep(line){
+  const cells = line.split(/\s*[|\t]\s*/).map(c=>c.trim()).filter(Boolean); let qty = null;
+  if (cells.length>1 && /^\d{1,4}$/.test(cells[cells.length-1]) && +cells[cells.length-1]>0) qty = +cells.pop();
+  if (cells.length>1 && /^\d{1,4}$/.test(cells[0])) cells.shift();
+  // Kurungan yang ada nombor, contoh (BB 40"), ialah ukuran: simpan dan sambung pada saiz.
+  const extra = []; const text = cells.join(" ").replace(/\(([^)]*\d[^)]*)\)/g, (_,x)=>{ extra.push(x.trim()); return " "; }).replace(/\s+/g," ").trim(), kids = /\bKIDS\b/i.test(text);
+  const parts = text.split(/\s+[-–]\s*|[-–]\s+/).map(x=>x.trim()).filter(Boolean), keep = []; let size = "";
+  parts.forEach((x,i)=>{ const n = norm(x);
+    if (i>0 && !size && (SIZE_RE.test(n) || (/^\d{1,2}$/.test(n) && (qty!==null || kids)))) size = n;
+    else if (i>0 && BRAND.has(n)) return;
+    else keep.push(x);
+  });
+  return {text: keep.join(" "), size, qty, extra: extra.join(", ")};
+}
+const withExtra = (size, extra) => extra ? (size ? size+" ("+extra+")" : "("+extra+")") : size;
+function parseOther(pre){
+  let name = pre.text, size = pre.size, qty = pre.qty, m;
+  if (qty===null) {
+    if ((m=/(?:^|\s)(?:x|qty|kuantiti)\s*[:=]?\s*(\d{1,3})\s*$/i.exec(name)) || (m=/(?:^|\s)(\d{1,3})\s*(?:x|pcs|pc|helai|buah|naskhah|set|unit)\s*$/i.exec(name))) { qty=+m[1]; name=name.slice(0,m.index); }
+  }
+  name = name.replace(/[\s\-–:,]+$/,"");
+  name = [...new Set(name.replace(/\//g," ").split(/\s+/).filter(w=>!BRAND.has(w.toUpperCase())).map(w=>w))].filter((w,i,a)=>a.findIndex(v=>v.toUpperCase()===w.toUpperCase())===i).join(" ");
+  if (!size && (m=/[\s\/]([A-Za-z0-9]{1,4})$/.exec(name)) && SIZE_RE.test(m[1].toUpperCase())) { size=m[1].toUpperCase(); name=name.slice(0,m.index).replace(/[\s\-–:,]+$/,""); }
+  return {name: name || pre.text, size: withExtra(size, pre.extra), color:"", qty: qty && qty>0 ? qty : 1};
+}
+function mergeOther(items){
+  const map = new Map();
+  for (const it of items) { const k = norm(it.name)+"|"+it.size, cur = map.get(k); if (cur) cur.qty += it.qty; else map.set(k, {...it}); }
+  return [...map.values()];
+}
+
+function classify(text){
+  const groups = Object.fromEntries(UNITS.map(u=>[u,[]]));
+  const missing = []; let lines = 0;
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.trim(); if (!line) continue;
+    if (HEADER_RE.test(norm(line)) || SKIP_RE.test(norm(line)) || /^((GRAND |SUB)?(JUMLAH|TOTAL)( BESAR| KESELURUHAN| QTY| KUANTITI)? ?)?[\d ]*$/.test(norm(line))) continue;
+    lines++;
+    const pre = prep(line), tok = norm(pre.text).split(" ").filter(Boolean), s0 = " " + tok.join(" ") + " ";
+    let i = 0; while (i<tok.length-1 && (/^\d+$/.test(tok[i]) || LEAD_SKIP.has(tok[i]))) i++;
+    const tail = tok.slice(i).join(" ") + " "; let entries = null, maybe = false, rest = null;
+    for (const k of KEYS) if (tail.startsWith(k + " ")) { entries = INDEX.get(k); rest = tok.slice(0,i).concat(tok.slice(i + k.split(" ").length)); break; }
+    if (!entries) for (const k of KEYS) {
+      if (INDEX.get(k).some(e=>e.unit===GROUND) && s0.includes(" " + k + " ")) { entries = INDEX.get(k).filter(e=>e.unit===GROUND); rest = s0.split(" " + k + " ").join(" ").trim().split(" "); break; }
+    }
+    if (!entries && !NOT_BAJU.test(s0) && tok[i] && tok[i].length>=4 && !STOP.has(tok[i])) {
+      const max = tok[i].length>=8 ? 2 : 1; let best = null, bd = 9;
+      for (const k of SINGLE) { if (INDEX.get(k).some(e=>e.unit===GROUND)) continue; const d = lev(tok[i],k,max); if (d<=max && d<bd) { bd=d; best=k; } }
+      if (best) { entries = INDEX.get(best); maybe = true; rest = tok.slice(0,i).concat(tok.slice(i+1)); }
+    }
+    if (!entries) { missing.push(parseOther(pre)); continue; }
+    const ex = parseExtra(rest.join(" "), pre.size), ground = entries[0].unit===GROUND;
+    const units = [...new Set(entries.map(e=>e.unit))], kids = !ground && rest.includes("KIDS");
+    groups[units[0]].push({name: [...new Set(entries.map(e=>e.name))].join(" / ") + (kids ? " KIDS" : ""), size: withExtra(ex.size, pre.extra), color: ground ? "" : ex.color,
+      qty: pre.qty!==null ? pre.qty : ex.qty, maybe, orig: maybe ? tok[i] : "", also: units.slice(1)});
+  }
+  for (const u of UNITS) groups[u] = merge(groups[u]);
+  return {groups, missing: mergeOther(missing), lines};
+}
+
+let result = null;
+const $ = id => document.getElementById(id);
+const el = (tag, cls, txt) => { const n=document.createElement(tag); if(cls) n.className=cls; if(txt!=null) n.textContent=txt; return n; };
+
+function render(){
+  result = classify($("src").value);
+  const found = UNITS.reduce((n,u)=>n+total(result.groups[u]),0);
+  const stats = $("stats"); stats.replaceChildren();
+  for (const [n,t,c] of [[result.lines,"baris",""],[found,"pcs dipadankan",""],[total(result.missing),"tiada unit",result.missing.length?"bad":""]]) {
+    const d = el("div","stat "+c); d.append(el("b",null,n), document.createTextNode(t)); stats.append(d);
+  }
+  const g = $("groups"); g.replaceChildren();
+  if (!result.lines) { g.append(el("p","hint","Belum ada senarai. Tampal nama baju di kotak atas, kemudian tekan Asingkan ikut unit.")); return; }
+  let cb = 0;
+  const section = (title, items, miss) => {
+    const box = el("div","unit"+(miss?" miss":""));
+    const head = el("div","unit-head"); head.append(el("span","unit-name",title), el("span","unit-count",total(items)+" pcs"));
+    const ul = el("ul","items");
+    for (const it of items) {
+      const li = el("li"), lab = el("label","item"), inp = el("input"); inp.type="checkbox"; inp.id="tick"+(cb++);
+      const main = el("div","item-main"), nm = el("div","item-name", it.name);
+      if (!miss) {
+        if (it.maybe) nm.append(el("span","badge maybe","ditulis "+it.orig+", sila semak"));
+        if (it.also.length) nm.append(el("span","badge also","atau di "+it.also.join(", ")));
+      }
+      if (it.size) nm.prepend(el("span","size",it.size));
+      main.append(nm); if (it.color) main.append(el("div","item-src","Warna: "+it.color));
+      lab.append(inp, main, el("span","qty","×"+it.qty)); li.append(lab); ul.append(li);
+    }
+    box.append(head, ul); g.append(box);
+  };
+  for (const u of UNITS) if (result.groups[u].length) section(u, result.groups[u], false);
+  if (result.missing.length) section("TIADA DALAM SENARAI UNIT", result.missing, true);
+}
+
+function note(text, err){ const m=$("actMsg"); m.textContent=text; m.className="msg"+(err?" err":""); m.hidden=false; }
+function whatsappText(){
+  const out=[];
+  for (const u of UNITS) { const a=result.groups[u]; if(!a.length) continue;
+    out.push("*"+u+"* ("+total(a)+" pcs)");
+    for (const it of a) out.push("- "+it.name+(it.color?" - "+it.color:"")+(it.size?" ("+it.size+")":"")+" x"+it.qty+(it.maybe?" (ditulis "+it.orig+", semak)":"")+(it.also.length?" (atau di "+it.also.join(", ")+")":""));
+    out.push(""); }
+  if (result.missing.length) { out.push("*TIADA DALAM SENARAI UNIT* ("+total(result.missing)+")"); result.missing.forEach(it=>out.push("- "+it.name+(it.size?" ("+it.size+")":"")+" x"+it.qty)); }
+  return out.join("\n").trim();
+}
+
+$("go").addEventListener("click", ()=>{ $("actMsg").hidden=true; $("copyOut").hidden=true; render(); $("out").scrollIntoView({behavior:"smooth",block:"start"}); });
+$("src").addEventListener("input", ()=>{ $("sampleTag").hidden=true; });
+$("clear").addEventListener("click", ()=>{ $("src").value=""; $("sampleTag").hidden=true; $("actMsg").hidden=true; $("copyOut").hidden=true; render(); $("src").focus(); });
+
+// PDF: pdf.js dimuat bila perlu sahaja. Worker dimuat sebagai skrip supaya pdf.js jalan di halaman ini.
+const PDFJS = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+let pdfReady = null;
+function loadScript(src){ return new Promise((ok,no)=>{ const t=document.createElement("script"); t.src=src; t.onload=ok; t.onerror=()=>no(new Error("load")); document.head.append(t); }); }
+function loadPdfJs(){
+  if (!pdfReady) pdfReady = loadScript(PDFJS+"pdf.min.js").then(()=>loadScript(PDFJS+"pdf.worker.min.js")).then(()=>{ window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS+"pdf.worker.min.js"; }).catch(e=>{ pdfReady=null; throw e; });
+  return pdfReady;
+}
+// Susun cebisan teks PDF jadi baris; jurang besar antara cebisan jadi pemisah lajur " | ".
+function pdfItemsToLines(items){
+  const it = items.filter(i=>i.s.trim()).sort((a,b)=>b.y-a.y || a.x-b.x), rows = [];
+  for (const i of it) { const r = rows[rows.length-1]; if (r && Math.abs(r.y-i.y) <= Math.max(2, i.h*0.5)) r.items.push(i); else rows.push({y:i.y, items:[i]}); }
+  return rows.map(r=>{ r.items.sort((a,b)=>a.x-b.x); let out="", end=null;
+    for (const i of r.items) { if (end!==null) { const gap = i.x-end; out += gap > Math.max(8, i.h*1.5) ? " | " : (gap > i.h*0.15 && !/\s$/.test(out) && !/^\s/.test(i.s) ? " " : ""); } out += i.s; end = i.x + i.w; }
+    return out.replace(/\s+/g," ").trim(); }).filter(Boolean);
+}
+// Jadual Pick List (# | Name | Variant | Qty): teks panjang dalam sel dipecah kepada beberapa baris dan diletak di tengah sel.
+// Kumpulkan semula setiap baris jadual berdasarkan nombor "#" yang paling dekat, dan lajur berdasarkan kedudukan tajuk.
+function pickListLines(items){
+  const find = re => items.find(i=>re.test(i.s.trim()));
+  const hName = find(/^name$/i), hVar = find(/^variant$/i), hQty = find(/^(qty\.?|quantity)$/i);
+  if (!hName || !hQty) return null;
+  const headY = Math.min(hName.y, hQty.y, hVar ? hVar.y : Infinity);
+  const body = items.filter(i=>i.s.trim() && i.y < headY - 1);
+  const anchors = body.filter(i=>i.x < hName.x - 1 && /^\d{1,4}$/.test(i.s.trim())).sort((a,b)=>b.y-a.y);
+  if (!anchors.length) return null;
+  let cap = 60; for (let k=1;k<anchors.length;k++) cap = Math.max(cap, anchors[k-1].y - anchors[k].y);
+  const rows = anchors.map(a=>({a, name:[], vari:[], qty:[]}));
+  for (const i of body) {
+    if (anchors.includes(i)) continue;
+    let best = null, bd = Infinity;
+    for (const r of rows) { const d = Math.abs(r.a.y - i.y); if (d < bd) { bd = d; best = r; } }
+    if (!best || bd > cap) continue;
+    if (i.x >= hQty.x - 3) best.qty.push(i); else if (hVar && i.x >= hVar.x - 3) best.vari.push(i); else best.name.push(i);
+  }
+  const txt = arr => pdfItemsToLines(arr).join(" ").trim();
+  return rows.map(r=>[txt(r.name), txt(r.vari), txt(r.qty)].filter(Boolean).join(" | ")).filter(Boolean);
+}
+async function pdfToText(buf){
+  const pdf = await window.pdfjsLib.getDocument({data:new Uint8Array(buf), isEvalSupported:false}).promise, lines=[];
+  for (let p=1;p<=pdf.numPages;p++) {
+    const tc = await (await pdf.getPage(p)).getTextContent();
+    const its = tc.items.map(i=>({s:i.str, x:i.transform[4], y:i.transform[5], w:i.width, h:Math.abs(i.transform[3])||i.height||10}));
+    lines.push(...(pickListLines(its) || pdfItemsToLines(its)));
+  }
+  return lines.join("\n");
+}
+
+$("file").addEventListener("change", async e=>{
+  const f = e.target.files && e.target.files[0]; const msg=$("fileMsg"); if(!f) return;
+  const say=(t,err)=>{ msg.textContent=t; msg.className="msg"+(err?" err":""); msg.hidden=false; };
+  say("Membaca "+f.name+"…");
+  try {
+    const buf = await new Promise((ok,no)=>{ const r=new FileReader(); r.onload=()=>ok(r.result); r.onerror=()=>no(r.error); r.readAsArrayBuffer(f); });
+    const b = new Uint8Array(buf.slice(0,4)), sig = Array.from(b).map(x=>x.toString(16).padStart(2,"0")).join("");
+    const isImg = (f.type||"").startsWith("image/") || /^(ffd8|8950|4749|5249)/.test(sig);
+    if (isImg) { say("Apps ini belum boleh baca gambar. Upload fail PDF, Excel, CSV atau TXT, atau tampal senarai terus ke kotak di atas.", true); e.target.value=""; return; }
+    let text;
+    if (sig==="25504446") {
+      say("Membaca PDF "+f.name+"…");
+      try { await loadPdfJs(); } catch(_) { say("Pembaca PDF gagal dimuatkan. Semak sambungan internet, muat semula halaman, kemudian cuba lagi.", true); e.target.value=""; return; }
+      text = await pdfToText(buf);
+      if (!text.trim()) { say("PDF ini tiada teks yang boleh dibaca (mungkin gambar imbasan). Guna PDF asal dari sistem, atau fail Excel.", true); e.target.value=""; return; }
+    } else if (sig.startsWith("504b") || sig.startsWith("d0cf")) {
+      if (typeof XLSX==="undefined") { say("Pembaca Excel gagal dimuatkan. Semak sambungan internet, muat semula halaman, kemudian cuba lagi.", true); e.target.value=""; return; }
+      const wb = XLSX.read(buf, {type:"array"}); const rows=[];
+      for (const n of wb.SheetNames) for (const r of XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:false,defval:""})) {
+        const cells = r.map(c=>String(c).trim()).filter(Boolean); if (cells.length) rows.push(cells.join(" | "));
+      }
+      text = rows.join("\n");
+    } else text = new TextDecoder("utf-8").decode(buf).replace(/^\uFEFF/,"").replace(/[,;\t]+/g," | ");
+    if (!text.trim()) { say("Fail "+f.name+" kosong, tiada baris untuk dibaca.", true); e.target.value=""; return; }
+    $("src").value = text; $("sampleTag").hidden=true; render();
+    say(f.name+" dimuatkan: "+result.lines+" baris.");
+  } catch(err) { say("Fail ini tidak dapat dibaca ("+(err && err.message || "ralat tidak diketahui")+"). Cuba simpan semula sebagai .xlsx atau .csv, atau tampal senarai terus ke kotak di atas.", true); }
+  e.target.value="";
+});
+
+$("copy").addEventListener("click", async ()=>{
+  if (!result || !result.lines) return note("Tiada senarai untuk disalin.", true);
+  const t = whatsappText();
+  try { await navigator.clipboard.writeText(t); note("Disalin. Tampal di WhatsApp."); }
+  catch(e) { const box=$("copyOut"); box.value=t; box.hidden=false; box.focus(); box.select(); note("Tekan lama pada teks di bawah untuk salin."); }
+});
+
+function exportRows(){
+  const rows=[["Unit","Baju","Warna","Saiz","Kuantiti","Catatan","Jumpa (/)"]]; let sum=0;
+  for (const u of UNITS) for (const it of result.groups[u]) { sum+=it.qty;
+    rows.push([[u, ...it.also].join(" atau "), it.name, it.color, it.size, it.qty, [it.maybe?"Ditulis "+it.orig+" dalam senarai, sila semak":"", it.also.length?"Disimpan di lebih daripada satu unit":""].filter(Boolean).join("; "), ""]); }
+  for (const it of result.missing) { sum+=it.qty; rows.push(["TIADA UNIT", it.name, "", it.size, it.qty, "Tiada dalam senarai unit", ""]); }
+  return {rows, sum};
+}
+// Tunggu window.claude muncul (paparan tertentu menyuntiknya lambat), kemudian minta keupayaan muat turun.
+let dlPromise = null;
+function getDownloads(){
+  if (!dlPromise) dlPromise = (async ()=>{
+    if (!(window.claude && window.claude.use)) return null;
+    try { return await window.claude.use("downloads"); } catch(_) { return null; }
+  })().then(v=>{ if (!v) dlPromise = null; return v; });
+  return dlPromise;
+}
+getDownloads();
+function stamp(){ const d=new Date(); return d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0"); }
+async function saveFile(dl, fname, data, kind){
+  const mime = kind==="PDF" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+  if (!dl) {
+    // Bila apps dibuka sebagai halaman sendiri (bukan dalam Claude), cuba muat turun terus melalui pelayar.
+    try {
+      const url = URL.createObjectURL(new Blob([data],{type:mime}));
+      const a = document.createElement("a"); a.href=url; a.download=fname; document.body.append(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 60000);
+      note("Muat turun dimulakan ("+fname+"). Kalau tiada fail dalam Downloads, buka apps melalui chat Claude.");
+    } catch(_) { note("Muat turun tidak tersedia dalam paparan ini. Buka apps melalui chat Claude, atau guna butang Salin untuk Excel.", true); }
+    return;
+  }
+  try { await dl.save({filename:fname, data}); note("Fail "+kind+" disimpan."); }
+  catch(err) {
+    if (err && err.code==="declined") note("Muat turun dibatalkan.", true);
+    else if (err && err.code==="rate_limited") note("Tunggu sebentar, kemudian cuba lagi.", true);
+    else note("Muat turun tidak tersedia di sini ("+((err&&err.code)||"ralat")+"). Guna butang Salin untuk Excel.", true);
+  }
+}
+
+// PDF: jsPDF dimuat bila perlu sahaja; jadual dilukis sendiri, satu bahagian setiap unit dengan kotak tanda "Jumpa".
+const JSPDF_URL = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+let jspdfReady = null;
+function loadJsPdf(){ if (!jspdfReady) jspdfReady = loadScript(JSPDF_URL).catch(e=>{ jspdfReady=null; throw e; }); return jspdfReady; }
+// PDF padat: dua lajur, saiz huruf dikecilkan sendiri sehingga semua muat dalam satu muka surat A4.
+function buildPdf(){
+  const doc = new window.jspdf.jsPDF({unit:"mm", format:"a4"});
+  const M=10, PW=210, PH=297, GAP=6, COLW=(PW-2*M-GAP)/2, TOP=M+15, BOTTOM=PH-8;
+  const cols=[{k:"chk",w:5},{k:"name",w:31,b:true},{k:"color",w:31},{k:"size",w:14},{k:"qty",w:11,r:true}];
+  const secs = UNITS.filter(u=>result.groups[u].length).map(u=>({title:u, items:result.groups[u].map(it=>({
+      name: it.name + (it.also.length ? " (atau "+it.also.join(", ")+")" : "") + (it.maybe ? " (semak: "+it.orig+")" : ""),
+      color: it.color, size: it.size, qty: it.qty}))}));
+  if (result.missing.length) secs.push({title:"TIADA UNIT", items:result.missing.map(it=>({name:it.name, color:"", size:it.size, qty:it.qty}))});
+  secs.forEach(sc=>sc.total = sc.items.reduce((n,i)=>n+i.qty,0));
+  const grand = secs.reduce((n,sc)=>n+sc.total,0);
+  // Susun (atau lukis) semua blok pada saiz huruf fs; pulangkan bilangan lajur yang dipakai.
+  function run(fs, draw){
+    const lh = fs*0.3528*1.15, pad = 1.3, hh = lh+2.2;
+    let col = 0, y = TOP;
+    const colX = c => M + (c%2)*(COLW+GAP);
+    const next = ()=>{ col++; y = TOP; if (draw && col%2===0) doc.addPage(); };
+    const header = (sc, cont)=>{
+      if (draw) { const x=colX(col); doc.setFillColor(139,38,89); doc.rect(x,y,COLW,hh,"F"); doc.setTextColor(255); doc.setFont("helvetica","bold"); doc.setFontSize(fs+0.5);
+        doc.text(sc.title+(cont?" (samb.)":""), x+1.5, y+hh-1.6); doc.text(sc.total+" pcs", x+COLW-1.5, y+hh-1.6, {align:"right"}); doc.setTextColor(0); }
+      y += hh;
+    };
+    for (const sc of secs) {
+      let first = true;
+      for (const it of sc.items) {
+        doc.setFontSize(fs);
+        const cells = cols.map(c=>{ if (c.k==="chk") return []; doc.setFont("helvetica", c.b?"bold":"normal"); return doc.splitTextToSize(String(it[c.k] ?? ""), c.w-2); });
+        const h = Math.max(1, ...cells.map(l=>l.length))*lh + pad;
+        if (y + (first ? hh : 0) + h > BOTTOM) { next(); if (!first) header(sc, true); }
+        if (first) { header(sc, false); first = false; }
+        if (draw) {
+          let x = colX(col);
+          cols.forEach((c,i)=>{
+            if (c.k==="chk") { doc.setDrawColor(90); doc.rect(x+0.6, y+(h-3.4)/2, 3.4, 3.4); }
+            else if (cells[i].length) { doc.setFont("helvetica", c.b?"bold":"normal"); doc.setFontSize(fs); doc.text(cells[i], c.r ? x+c.w-1 : x+1, y+pad/2+lh*0.78, {align: c.r?"right":"left"}); }
+            x += c.w;
+          });
+          doc.setDrawColor(215); doc.line(colX(col), y+h, colX(col)+COLW, y+h);
+        }
+        y += h;
+      }
+      y += lh*0.6;
+    }
+    return col+1;
+  }
+  let fs = 9; while (fs > 5 && run(fs, false) > 2) fs -= 0.5;
+  doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.text("Senarai Baju Ikut Unit", M, M+5);
+  const d=new Date(); doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(80);
+  doc.text("Tarikh: "+d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear()+"   |   Jumlah: "+grand+" pcs   |   Lajur: Jumpa, Baju, Warna, Saiz, Qty", M, M+10.5);
+  doc.setTextColor(0);
+  run(fs, true);
+  const pages = doc.getNumberOfPages();
+  if (pages>1) for (let i=1;i<=pages;i++) { doc.setPage(i); doc.setFontSize(7.5); doc.setTextColor(120); doc.text("Muka "+i+" / "+pages, PW-M, PH-4, {align:"right"}); }
+  return doc.output("arraybuffer");
+}
+$("pdf").addEventListener("click", async ()=>{
+  if (!result || !result.lines) return note("Tiada senarai untuk dimuat turun.", true);
+  note("Menyediakan fail PDF…");
+  try { await loadJsPdf(); } catch(_) { return note("Pembina PDF gagal dimuatkan. Semak sambungan internet, muat semula halaman, kemudian cuba lagi.", true); }
+  let data; try { data = buildPdf(); } catch(err) { return note("PDF gagal dibina ("+(err&&err.message||"ralat")+").", true); }
+  await saveFile(await getDownloads(), "Baju_ikut_unit_"+stamp()+".pdf", data, "PDF");
+});
+$("dl").addEventListener("click", async ()=>{
+  if (!result || !result.lines) return note("Tiada senarai untuk dimuat turun.", true);
+  if (typeof XLSX==="undefined") return note("Pembina Excel gagal dimuatkan. Muat semula halaman, atau guna butang Salin untuk Excel.", true);
+  note("Menyediakan fail Excel…");
+  const dl = await getDownloads();
+  const {rows, sum} = exportRows(), last=rows.length;
+  rows.push(["JUMLAH","","","",{t:"n",v:sum,f:"SUM(E2:E"+last+")"},"",""]);
+  const wb=XLSX.utils.book_new(), ws=XLSX.utils.aoa_to_sheet(rows);
+  ws["!cols"]=[{wch:28},{wch:36},{wch:20},{wch:8},{wch:10},{wch:44},{wch:10}];
+  XLSX.utils.book_append_sheet(wb, ws, "Ikut Unit");
+  const fname = "Baju_ikut_unit_"+stamp()+".xlsx", data = XLSX.write(wb,{bookType:"xlsx",type:"array"});
+  await saveFile(dl, fname, data, "Excel");
+});
+$("copyXls").addEventListener("click", async ()=>{
+  if (!result || !result.lines) return note("Tiada senarai untuk disalin.", true);
+  const {rows, sum} = exportRows(); rows.push(["JUMLAH","","","",sum,"",""]);
+  const t = rows.map(r=>r.map(c=>String(c).replace(/[\t\n]/g," ")).join("\t")).join("\n");
+  try { await navigator.clipboard.writeText(t); note("Disalin. Buka Excel atau Google Sheets, pilih sel A1 dan tampal."); }
+  catch(e) { const box=$("copyOut"); box.value=t; box.hidden=false; box.focus(); box.select(); note("Tekan lama pada teks di bawah untuk salin, kemudian tampal ke Excel."); }
+});
+
+const mBox=$("master");
+for (const u of UNITS){ const d=el("div"); d.append(el("b",null,u+" · "+MASTER[u].split(",").length), el("p",null,MASTER[u].split(",").join(", "))); mBox.append(d); }
+$("src").value = SAMPLE; render();
+</script>
+
+</body></html>
